@@ -1,27 +1,27 @@
 {
-  "name": "gulp-tmod",
-  "version": "1.0.3",
-  "description": "the gulp plugin for tmodjs",
+  "name": "gulp-jsonToMap",
+  "version": "0.0.1",
+  "description": "the gulp plugin for cover json file to js file format arrary",
   "main": "index.js",
   "scripts": {
-    "test": "gulp && gulp test-stream &&  gulp jshint "
+    "test": "gulp test "
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/lichunqiang/gulp-tmod"
+    "url": "git://github.com/landy2014/gulp-jsonToMap"
   },
   "keywords": [
-    "gulpplugin",
-    "tmodjs",
-    "seajs",
-    "requirejs"
+    "gulp",
+    "plugin",
+    "json",
+    "map"
   ],
-  "author": "light",
+  "author": "landy2014",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/lichunqiang/gulp-tmod/issues"
+    "url": "https://github.com/landy2014/gulp-jsonToMap/issues"
   },
-  "homepage": "https://github.com/lichunqiang/gulp-tmod",
+  "homepage": "https://github.com/landy2014/gulp-jsonToMap",
   "devDependencies": {
     "gulp": "^3.8.6",
     "gulp-jshint": "^1.7.1",
@@ -29,7 +29,6 @@
   },
   "dependencies": {
     "gulp-util": "^3.0.0",
-    "through2": "^2.0.0",
-    "tmodjs": "^1.0.0"
+    "through2": "^2.0.0"
   }
 }
