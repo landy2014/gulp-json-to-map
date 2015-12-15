@@ -1,6 +1,6 @@
 {
   "name": "gulp-jsonToMap",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "the gulp plugin for cover json file to js file format arrary",
   "main": "index.js",
   "scripts": {
