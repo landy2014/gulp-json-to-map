@@ -1,34 +1,14 @@
 {
   "name": "gulp-jsonToMap",
-  "version": "0.0.2",
-  "description": "the gulp plugin for cover json file to js file format arrary",
+  "version": "1.0.0",
+  "description": "gulp plugin for format json to map",
   "main": "index.js",
   "scripts": {
-    "test": "gulp test "
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/landy2014/gulp-jsonToMap"
+    "test": "gulp test"
   },
   "keywords": [
-    "gulp",
-    "plugin",
-    "json",
-    "map"
+    "gulp"
   ],
   "author": "landy2014",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/landy2014/gulp-jsonToMap/issues"
-  },
-  "homepage": "https://github.com/landy2014/gulp-jsonToMap",
-  "devDependencies": {
-    "gulp": "^3.8.6",
-    "gulp-jshint": "^1.7.1",
-    "gulp-watch": "^0.6.8"
-  },
-  "dependencies": {
-    "gulp-util": "^3.0.0",
-    "through2": "^2.0.0"
-  }
+  "license": "MIT"
 }
