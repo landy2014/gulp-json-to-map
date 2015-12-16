@@ -1,6 +1,6 @@
 {
-  "name": "0",
-  "version": "1.0.2",
+  "name": "gulp-jsontomap",
+  "version": "1.0.1",
   "description": "gulp plugin for format json to map",
   "main": "index.js",
   "scripts": {
