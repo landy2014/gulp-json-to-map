@@ -1,7 +1,8 @@
 'use strict';
 
 var fs = require('fs');
-var path = require('path');
+var pt = require('path');
+var File = require("vinyl-file");
 
 var through = require('through2');
 var gutil = require('gulp-util');
@@ -15,14 +16,28 @@ module.exports = function (opts) {
 
   var dest = opts.dest || "./dest";
   var base = opts.base || "./";
-  var output = opts.output || "./dest/";
-  var name   = opts.name || "map.js";
+  var path = opts.path || "map.js";
 
   var paths = [];
 
+  function getMapFile(opts, cb) {
+    File.read(opts.path, opts, function (err, mapFile) {
+      if (err) {
+        // not found
+        if (err.code === 'ENOENT') {
+          cb(null, new gutil.File(opts));
 
+        } else {
+          cb(err);
+        }
 
-  return through.obj(function (file, encoding, cb) {
+        return;
+      }
+      cb(null, mapFile);
+    });
+  }
+
+  return through.obj(function (file, enc, cb) {
     //console.log(this,file);
     //console.log(output, name, path.resolve(output, name));
     //return ;
@@ -34,27 +49,30 @@ module.exports = function (opts) {
     }
 
     if (file.isStream()) {
-      cb(new gutil.PluginError('gulp-rev', 'Streaming not supported'));
+      cb(new gutil.PluginError(PLUGIN_NAME, 'Streaming not supported'));
       return;
     }
 
-    paths.push(path.resolve(base,file.path));
+    //paths.push(path.resolve(base,file.path));
 
 
-    var data = JSON.parse(fs.readFileSync(paths[0],"utf8"));
+    var data = JSON.parse(fs.readFileSync(pt.resolve(base,file.path),"utf8"));
 
-    //coverJSON(data);
+    getMapFile(opts, function(err, mapFile){
 
-    var mapFile = fs.writeFile(path.resolve(output,name),coverJSON(data),function(err){
-        if(err) throw err;
-        console.log("done...");
+      if (err) {
+        cb(err);
+        return;
+      }
+      mapFile.contents = new Buffer(coverJSON(data), null, ' ff ');
+      gutil.log("file path:"+mapFile.contents);
+      that.push(mapFile);
 
     });
 
-
-    this.push(file);
-
     cb();
+
+  },function(cb) {
 
   });
 
