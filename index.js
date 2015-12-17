@@ -2,61 +2,87 @@
 
 var fs = require('fs');
 var path = require('path');
-var TmodJS = require("tmodjs");
 
 var through = require('through2');
 var gutil = require('gulp-util');
 
-var PLUGIN_NAME = 'gulp-tmod';
+var PLUGIN_NAME = 'gulp-json-to-map';
 
-module.exports = function(opts) {
-	var opts = opts || {};
+module.exports = function (opts) {
 
-	var base = path.resolve(opts.base || './');
 
-	var paths = [];
+  var opts = opts || {};
 
-	return through.obj(function(file, encoding, cb){
-		var that = this;
+  var dest = opts.dest || "./dest";
+  var base = opts.base || "./";
+  var output = opts.output || "./dest/";
+  var name   = opts.name || "map.js";
 
-		if(file.isNull()) {
-			this.push(file);
-			return cb();
-		}
+  var paths = [];
 
-		paths.push(path.normalize(path.relative(base, file.path)));
 
-		this.push(file);
-		cb();
 
-	}, function(cb){
-		if(paths.length === 0) {
-			return cb();
-		}
-
-		var tmod = new TmodJS(base, opts);
+  return through.obj(function (file, encoding, cb) {
+    //console.log(this,file);
+    //console.log(output, name, path.resolve(output, name));
+    //return ;
     var that = this;
 
-    tmod.on('compile', function (error, data) {
-    	if (error) {
-		    that.emit('error', new gutil.PluginError(PLUGIN_NAME, error));//throw tmodjs error
-		    return cb();
-    	}
-			cb(); //type非defaut时无法正常结束;
+    if (file.isNull()) {
+      cb(null, file);
+      return;
+    }
+
+    if (file.isStream()) {
+      cb(new gutil.PluginError('gulp-rev', 'Streaming not supported'));
+      return;
+    }
+
+    paths.push(path.resolve(base,file.path));
+
+
+    var data = JSON.parse(fs.readFileSync(paths[0],"utf8"));
+
+    //coverJSON(data);
+
+    var mapFile = fs.writeFile(path.resolve(output,name),coverJSON(data),function(err){
+        if(err) throw err;
+        console.log("done...");
+
     });
 
 
-    tmod.on('combo', function (error, data) {
-    	if (!error) {
-    		var comboFile = path.relative('./', data.outputFile);
-    		gutil.log('File "' + comboFile + '" created.');
-    		cb();
-    	}
+    this.push(file);
+
+    cb();
+
+  });
+
+  //cover JSON to string
+  function coverJSON(data) {
+    var mapArr = [];
+    var tempStr = "seajs.config({ map : ";
+    var tempLastStr = "});";
+
+    //json 转换为数组
+    Object.keys(data).forEach(function(key){
+      mapArr.push([key,data[key]]);
     });
 
-    tmod.on('debug', function (error) {
-    	return cb();
-    });
-    tmod.compile(paths);
-	});
-}
+    //数组转换为字符串
+    var mapStr = "[";
+    var len = mapArr.length;
+
+    for(var i=0; i<len; i++) {
+      if(i===len-1) {
+        mapStr += "[\"" + mapArr[i][0] + "\",\"" + mapArr[i][1] + "\"]]";
+      }else{
+        mapStr += "[\"" + mapArr[i][0] + "\",\"" + mapArr[i][1] + "\"],";
+      }
+    }
+
+    //返回拼合的字符串
+    return tempStr+mapStr+tempLastStr;
+  }
+
+};
