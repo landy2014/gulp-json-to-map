@@ -6,13 +6,30 @@
   "scripts": {
     "test": "gulp test"
   },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:landy2014/gulp-json-to-map.git"
+  },
   "keywords": [
-    "gulp"
+    "gulp",
+    "json",
+    "cover"
   ],
   "author": "landy2014",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/landy2014/gulp-json-to-map/issues"
+  },
+  "homepage": "https://github.com/landy2014/gulp-json-to-map",
   "devDependencies": {
+    "gulp": "^3.8.6",
     "gulp-util": "^3.0.7",
+    "through2": "^2.0.0",
+    "vinyl": "^1.1.0",
+    "vinyl-file": "^1.3.0"
+  },
+  "dependencies": {
+    "gulp-util": "^3.0.0",
     "through2": "^2.0.0"
   }
 }
