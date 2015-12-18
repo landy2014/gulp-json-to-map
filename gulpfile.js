@@ -3,10 +3,11 @@ var gulp = require('gulp');
 var jsontomap = require('./index.js');
 
 gulp.task("test",function(){
-    gulp.src("./tests/map/*.json")
+    gulp.src("./tests/js/*.js")
       .pipe(jsontomap({
-          base : "./tests/dest",
+          file : "./tests/map/static-map.json",
+          base : "./",
           path   : "map.js"
       }))
-      //.pipe(gulp.dest("./dest"))
+      .pipe(gulp.dest("./dest"))
 });

@@ -9,38 +9,67 @@ var gutil = require('gulp-util');
 
 var PLUGIN_NAME = 'gulp-json-to-map';
 
-module.exports = function (opts) {
+
+
+function getMapFile(opts, cb) {
+  File.read(opts.path, opts, function (err, mapFile) {
+    if (err) {
+      // not found
+      if (err.code === 'ENOENT') {
+        cb(null, new gutil.File(opts));
+
+      } else {
+        cb(err);
+      }
+
+      return;
+    }
+    cb(null, mapFile);
+  });
+}
+
+//cover JSON to string
+function coverJSON(data) {
+  var mapArr = [];
+  var tempStr = "seajs.config({ map : ";
+  var tempLastStr = "});";
+
+  //json 转换为数组
+  Object.keys(data).forEach(function(key){
+    mapArr.push([key,data[key]]);
+  });
+
+  //数组转换为字符串
+  var mapStr = "[";
+  var len = mapArr.length;
+
+  for(var i=0; i<len; i++) {
+    if(i===len-1) {
+      mapStr += "[\"" + mapArr[i][0] + "\",\"" + mapArr[i][1] + "\"]]";
+    }else{
+      mapStr += "[\"" + mapArr[i][0] + "\",\"" + mapArr[i][1] + "\"],";
+    }
+  }
+
+  //返回拼合的字符串
+  return tempStr+mapStr+tempLastStr;
+}
+
+var paths = [];
+
+var plugin = function (opts) {
 
 
   var opts = opts || {};
 
-  var dest = opts.dest || "./dest";
+  var sFile = opts.file || "./dest";
   var base = opts.base || "./";
   var path = opts.path || "map.js";
 
-  var paths = [];
 
-  function getMapFile(opts, cb) {
-    File.read(opts.path, opts, function (err, mapFile) {
-      if (err) {
-        // not found
-        if (err.code === 'ENOENT') {
-          cb(null, new gutil.File(opts));
-
-        } else {
-          cb(err);
-        }
-
-        return;
-      }
-      cb(null, mapFile);
-    });
-  }
 
   return through.obj(function (file, enc, cb) {
-    //console.log(this,file);
-    //console.log(output, name, path.resolve(output, name));
-    //return ;
+
     var that = this;
 
     if (file.isNull()) {
@@ -53,11 +82,8 @@ module.exports = function (opts) {
       return;
     }
 
-    //paths.push(path.resolve(base,file.path));
-
-
-    var data = JSON.parse(fs.readFileSync(pt.resolve(base,file.path),"utf8"));
-
+    var data = JSON.parse(fs.readFileSync(sFile,"utf8"));
+    //console.log(data);
     getMapFile(opts, function(err, mapFile){
 
       if (err) {
@@ -65,42 +91,33 @@ module.exports = function (opts) {
         return;
       }
       mapFile.contents = new Buffer(coverJSON(data), null, ' ff ');
-      gutil.log("file path:"+mapFile.contents);
-      that.push(mapFile);
+      gutil.log("file " + mapFile.path + " created...");
+      //that.push(mapFile);
+      //paths.push(mapFile);
+
+      fs.appendFile(file.path,mapFile.contents,{encoding : "utf8"},function(err){
+        if(err) throw err;
+        console.log(file);
+      });
+
+      that.push(file);
+
 
     });
 
     cb();
 
+    //console.log(paths);
+
+
+    //this.push(file);
+    //cb();
+
   },function(cb) {
 
   });
 
-  //cover JSON to string
-  function coverJSON(data) {
-    var mapArr = [];
-    var tempStr = "seajs.config({ map : ";
-    var tempLastStr = "});";
-
-    //json 转换为数组
-    Object.keys(data).forEach(function(key){
-      mapArr.push([key,data[key]]);
-    });
-
-    //数组转换为字符串
-    var mapStr = "[";
-    var len = mapArr.length;
-
-    for(var i=0; i<len; i++) {
-      if(i===len-1) {
-        mapStr += "[\"" + mapArr[i][0] + "\",\"" + mapArr[i][1] + "\"]]";
-      }else{
-        mapStr += "[\"" + mapArr[i][0] + "\",\"" + mapArr[i][1] + "\"],";
-      }
-    }
-
-    //返回拼合的字符串
-    return tempStr+mapStr+tempLastStr;
-  }
-
 };
+
+
+module.exports = plugin;
