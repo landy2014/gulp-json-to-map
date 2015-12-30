@@ -70,6 +70,7 @@ var plugin = function (opts) {
 
   },function(cb) {
     console.log("cover done...");
+    cb();
   });
 
 };

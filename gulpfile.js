@@ -1,5 +1,5 @@
 var gulp = require('gulp');
-var uglify = require("gulp-uglify");
+var uglify = require("gulp-uglifyjs");
 var jsontomap = require('./index.js');
 
 gulp.task("test",function(){
