@@ -2,31 +2,12 @@
 
 var fs = require('fs');
 var pt = require('path');
-var File = require("vinyl-file");
 
 var through = require('through2');
 var gutil = require('gulp-util');
 
 var PLUGIN_NAME = 'gulp-json-to-map';
 
-
-
-function getMapFile(opts, cb) {
-  File.read(opts.path, opts, function (err, mapFile) {
-    if (err) {
-      // not found
-      if (err.code === 'ENOENT') {
-        cb(null, new gutil.File(opts));
-
-      } else {
-        cb(err);
-      }
-
-      return;
-    }
-    cb(null, mapFile);
-  });
-}
 
 //cover JSON to string
 function coverJSON(data) {
@@ -55,22 +36,17 @@ function coverJSON(data) {
   return tempStr+mapStr+tempLastStr;
 }
 
-var paths = [];
-
 var plugin = function (opts) {
-
 
   var opts = opts || {};
 
-  var sFile = opts.file || "./dest";
+  var sFile = opts.file || "./map/static-map.json";
   var base = opts.base || "./";
-  var path = opts.path || "map.js";
 
-
+  var data = JSON.parse(fs.readFileSync(sFile,"utf8")); //要写入文件的json文件
+  var tempData = coverJSON(data);                       //转换为要写入的字符串
 
   return through.obj(function (file, enc, cb) {
-
-    var that = this;
 
     if (file.isNull()) {
       cb(null, file);
@@ -82,42 +58,20 @@ var plugin = function (opts) {
       return;
     }
 
-    var data = JSON.parse(fs.readFileSync(sFile,"utf8"));
-    //console.log(data);
-    getMapFile(opts, function(err, mapFile){
+    var tempContent = file.contents;  //暂存文件内容
 
-      if (err) {
-        cb(err);
-        return;
-      }
-      mapFile.contents = new Buffer(coverJSON(data), null, ' ff ');
-      gutil.log("file " + mapFile.path + " created...");
-      //that.push(mapFile);
-      //paths.push(mapFile);
+    file.contents = new Buffer(tempData+tempContent,"utf8"); //重写文件内容
 
-      fs.appendFile(file.path,mapFile.contents,{encoding : "utf8"},function(err){
-        if(err) throw err;
-        console.log(file);
-      });
+    gutil.log("write file:"+ pt.basename(file.path) + " success!");        //输出是否写入成功
 
-      that.push(file);
-
-
-    });
+    this.push(file);  //输出到文件流
 
     cb();
 
-    //console.log(paths);
-
-
-    //this.push(file);
-    //cb();
-
   },function(cb) {
-
+    console.log("cover done...");
   });
 
 };
-
 
 module.exports = plugin;
