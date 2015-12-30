@@ -1,6 +1,6 @@
 {
   "name": "gulp-json-to-map",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "gulp plugin for format json to map",
   "main": "index.js",
   "scripts": {
