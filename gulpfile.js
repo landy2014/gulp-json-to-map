@@ -1,13 +1,16 @@
 var gulp = require('gulp');
-
+var uglify = require("gulp-uglify");
 var jsontomap = require('./index.js');
 
 gulp.task("test",function(){
-    gulp.src("./tests/js/*.js")
+    return gulp.src("./tests/js/*.js")
       .pipe(jsontomap({
-          file : "./tests/map/static-map.json",
-          base : "./",
-          path   : "map.js"
+          file : "./tests/map/map.json",
+          base : "./"
       }))
-      .pipe(gulp.dest("./dest"))
+      .pipe(uglify({
+        mangle: false,
+        debug : true
+      }))
+      .pipe(gulp.dest("./tests/dist"))
 });
